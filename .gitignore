@@ -1,0 +1,12 @@
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Données locales (le fichier CSV)
+*.csv
+store.csv
+
+# Caches Python et Streamlit
+__pycache__/
+.streamlit/config.toml
