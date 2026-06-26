@@ -14,17 +14,25 @@ st.set_page_config(
 # --- 2. CHARGEMENT DES DONNÉES AVEC MISE EN CACHE ---
 @st.cache_data(ttl=3600)
 def load_data(path):
+    import os
+    # Si le fichier local n'existe pas (cas de Streamlit Cloud), on utilise le lien direct Google Drive de l'examen
+    if not os.path.exists(path):
+        # Lien de téléchargement direct extrait de l'ID du Drive de l'examen
+        path = "https://docs.google.com/uc?export=download&id=18RtaRhnXO1ISBq6WU5gfQ8SQ7bQP0AaM"
+    
     df = pd.read_csv(path)
     # Conversion des colonnes de dates au format datetime standard
     df["Order Date"] = pd.to_datetime(df["Order Date"])
     df["Ship Date"] = pd.to_datetime(df["Ship Date"])
     return df
 
+# --- EXÉCUTION DU CHARGEMENT (LA CORRECTION EST ICI) ---
 try:
     df_raw = load_data(DATA_PATH)
 except Exception as e:
-    st.error(f"Erreur lors du chargement du fichier CSV. Vérifiez le chemin dans config.py. Détails : {e}")
+    st.error(f"Erreur lors du chargement des données. Détails : {e}")
     st.stop()
+
 
 # --- 3. SIDERBAR & FILTRES (Deux types de filtres différents demandés) ---
 with st.sidebar:
