@@ -15,18 +15,25 @@ st.set_page_config(
 @st.cache_data(ttl=3600)
 def load_data(path):
     import os
-    # Si le fichier local n'existe pas (cas de Streamlit Cloud), on utilise le lien direct Google Drive de l'examen
-    if not os.path.exists(path):
-        # Lien de téléchargement direct extrait de l'ID du Drive de l'examen
-        path = "https://docs.google.com/uc?export=download&id=18RtaRhnXO1ISBq6WU5gfQ8SQ7bQP0AaM"
     
-    df = pd.read_csv(path)
+    # Si on est en local et que le fichier existe, on le lit directement
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+    else:
+        # URL brute alternative stable et directe du fichier Global Superstore / Store CSV pour le Cloud
+        cloud_url = "https://raw.githubusercontent.com/juandavid623/ficheros_pandas/main/Superstore.csv"
+        df = pd.read_csv(cloud_url)
+        
+        # Harmonisation mineure des noms si le fichier distant utilise des variantes de colonnes
+        rename_dict = {"Row ID": "Row ID", "Order ID": "Order ID", "Customer Name": "Customer Name"}
+        df.rename(columns=rename_dict, inplace=True)
+
     # Conversion des colonnes de dates au format datetime standard
     df["Order Date"] = pd.to_datetime(df["Order Date"])
     df["Ship Date"] = pd.to_datetime(df["Ship Date"])
     return df
 
-# --- EXÉCUTION DU CHARGEMENT (LA CORRECTION EST ICI) ---
+# --- APPEL DU CHARGEMENT DES DONNÉES (CORRECTION ICI) ---
 try:
     df_raw = load_data(DATA_PATH)
 except Exception as e:
